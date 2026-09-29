@@ -46,11 +46,11 @@
 
       const rfm = await (await fetch('/api/rfm')).json();
       const rfmDiv = document.getElementById('rfm');
-      rfmDiv.innerHTML = '<h2>Artist RFM Segmentation</h2><table><tr><th>Artist</th><th>Recency (days)</th><th>Frequency (plays)</th><th>Monetary (minutes)</th></tr></table>';
+      rfmDiv.innerHTML = '<h2>Artist RFM Segmentation</h2><table><tr><th>Artist</th><th>Recency (days)</th><th>Frequency (plays)</th><th>Monetary (minutes)</th><th>R/F/M</th><th>Segment</th></tr></table>';
       const table = rfmDiv.querySelector('table');
       rfm.forEach(r => {
         const tr = document.createElement('tr');
-        tr.innerHTML = `<td>${r.artist}</td><td>${r.recency_days}</td><td>${r.frequency}</td><td>${r.monetary_minutes}</td>`;
+        tr.innerHTML = `<td>${r.artist}</td><td>${r.recency_days}</td><td>${r.frequency}</td><td>${r.monetary_minutes}</td><td>${r.r_score}/${r.f_score}/${r.m_score}</td><td>${r.segment}</td>`;
         table.appendChild(tr);
       });
 

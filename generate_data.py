@@ -4,6 +4,7 @@ real export you'll get from Apple (timestamp, track, artist, album, ms played).
 Once your real export lands, swap this file out — same column structure.
 """
 import csv
+import os
 import random
 from datetime import datetime, timedelta
 
@@ -69,6 +70,7 @@ for artist, track, album in catalog:
 
 rows.sort(key=lambda r: r["timestamp"])
 
+os.makedirs("data", exist_ok=True)
 with open("data/apple_music_history.csv", "w", newline="") as f:
     writer = csv.DictWriter(f, fieldnames=rows[0].keys())
     writer.writeheader()
