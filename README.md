@@ -54,6 +54,13 @@ python app.py               # http://localhost:5002
 
 ## Project structure
 
+generate_data.py   synthetic play-history generator
+data_loader.py     CSV -> normalized SQLite schema
+analytics.py       cohort retention, RFM, top artists (pure SQL)
+app.py             Flask API + dashboard route
+dashboard.html     single-page dashboard
+query.py           standalone cohort query for quick terminal checks
+
 ## Stack
 
 Python, Flask, SQLite, SQL (joins, correlated subqueries, `strftime` date bucketing, aggregates), vanilla JS.
