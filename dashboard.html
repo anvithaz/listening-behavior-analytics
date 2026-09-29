@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Apple Music Listening Analytics</title>
+  <style>
+    body { font-family: -apple-system, sans-serif; max-width: 900px; margin: 40px auto; padding: 0 20px; color: #222; }
+    h1 { font-size: 1.4em; }
+    h2 { font-size: 1.1em; margin-top: 40px; color: #333; }
+    table { border-collapse: collapse; width: 100%; margin-top: 12px; font-size: 0.9em; }
+    th, td { border: 1px solid #ddd; padding: 6px 10px; text-align: left; }
+    th { background: #f5f5f5; }
+    .bar-row { display: flex; align-items: center; margin: 6px 0; }
+    .bar-label { width: 160px; font-size: 0.85em; }
+    .bar { height: 20px; background: #a855f7; border-radius: 4px; color: white; font-size: 0.8em; display: flex; align-items: center; padding-left: 6px; }
+    #loading { color: #999; }
+  </style>
+</head>
+<body>
+  <h1>Apple Music Listening Analytics</h1>
+  <p>Cohort retention and artist RFM segmentation from personal listening history.</p>
+  <div id="loading">Loading...</div>
+
+  <div id="top-artists"></div>
+  <div id="cohort"></div>
+  <div id="rfm"></div>
+
+  <script>
+    async function load() {
+      document.getElementById('loading').style.display = 'none';
+
+      const artists = await (await fetch('/api/top-artists')).json();
+      const artistsDiv = document.getElementById('top-artists');
+      artistsDiv.innerHTML = '<h2>Top Artists by Play Count</h2>';
+      const maxPlays = Math.max(...artists.map(a => a.play_count));
+      artists.forEach(a => {
+        const row = document.createElement('div');
+        row.className = 'bar-row';
+        row.innerHTML = `
+          <div class="bar-label">${a.artist}</div>
+          <div class="bar" style="width:${(a.play_count / maxPlays * 400).toFixed(0)}px">
+            ${a.play_count} plays (${a.avg_seconds}s avg)
+          </div>`;
+        artistsDiv.appendChild(row);
+      });
+
+      const rfm = await (await fetch('/api/rfm')).json();
+      const rfmDiv = document.getElementById('rfm');
+      rfmDiv.innerHTML = '<h2>Artist RFM Segmentation</h2><table><tr><th>Artist</th><th>Recency (days)</th><th>Frequency (plays)</th><th>Monetary (minutes)</th></tr></table>';
+      const table = rfmDiv.querySelector('table');
+      rfm.forEach(r => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `<td>${r.artist}</td><td>${r.recency_days}</td><td>${r.frequency}</td><td>${r.monetary_minutes}</td>`;
+        table.appendChild(tr);
+      });
+
+      const cohort = await (await fetch('/api/cohort-retention')).json();
+      const cohortDiv = document.getElementById('cohort');
+      cohortDiv.innerHTML = '<h2>Cohort Retention (plays by cohort month x play month)</h2><table><tr><th>Cohort Month</th><th>Play Month</th><th>Plays</th></tr></table>';
+      const ctable = cohortDiv.querySelector('table');
+      cohort.forEach(c => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `<td>${c.cohort_month}</td><td>${c.play_month}</td><td>${c.plays}</td>`;
+        ctable.appendChild(tr);
+      });
+    }
+
+    load();
+  </script>
+</body>
+</html>
